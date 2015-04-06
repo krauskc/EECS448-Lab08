@@ -9,10 +9,12 @@ using namespace std;
 
 Retailer::Retailer() {
     theGoods = new Goods;
+    SupplierA = new Supplier;
 }
 
-Retailer::Retailer(Goods* goods) {
+Retailer::Retailer(Goods* goods, Supplier* supplier) {
     theGoods = goods;
+    SupplierA = supplier;
 }
 
 double Retailer::getOrder(unsigned orderID) {
@@ -37,6 +39,13 @@ unsigned Retailer::checkSupply(unsigned goodID) {
 
 unsigned Retailer::acceptOrder(order newOrder) {
     orderList.push_front(newOrder);
+    if(checkSupply(newOrder.theGood.goodID) > newOrder.orderQty) {
+        
+    } else {
+        
+    }
+    
+    
     return newOrder.orderID;
 }
 
@@ -47,6 +56,10 @@ double Retailer::acceptPayment(unsigned orderID, double amount) {
             double temp = iter->totalPrice;
             if(iter->totalPrice <= 0.0) {
                 orderList.erase(iter);
+                if(checkSupply(iter->theGood.goodID) < iter->orderQty) {
+                    orderGoods(SupplierA, iter->theGood.goodID, iter->orderQty);
+                }
+                updateGoods(iter->theGood.goodID, iter->theGood.goodName, iter->theGood.goodQuantity - iter->orderQty, iter->theGood.goodPrice);
             }
             return temp;
         }
@@ -55,7 +68,18 @@ double Retailer::acceptPayment(unsigned orderID, double amount) {
     return -amount;
 }
 
-// TODO: orderGoods(), updateGoods()
+bool Retailer::orderGoods(Supplier* supplier, unsigned goodID, unsigned quantity) {
+    for(theGoods->iter = theGoods->goodsList.begin(); theGoods->iter != theGoods->goodsList.end(); theGoods->iter++) {
+        if(theGoods->iter->goodID == goodID) {
+            return supplier->updateGood(goodID, theGoods->iter->goodName, quantity, theGoods->iter->goodPrice);
+        }
+    }
+    return false;
+}
+
+bool Retailer::updateGoods(unsigned ID, std::string name, unsigned quantity, double price) {
+    return theGoods->updateGood(ID, name, quantity, price);
+}
 
 bool Retailer::ackContact() {
     return true;

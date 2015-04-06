@@ -19,7 +19,7 @@ class Customer {
         unsigned    selectOrder(Retailer* retailer, unsigned orderID, unsigned goodID, unsigned qty);
         unsigned    viewOrder(Retailer* retailer, unsigned ID);
         double      makePayment(Retailer* retailer, unsigned orderID, double amount);
-        bool        contactRetailer();
+        bool        contactRetailer(Retailer* retailer);
 };
 
 #endif

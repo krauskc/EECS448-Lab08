@@ -2,6 +2,7 @@
 #include <string>
 #include <list>
 #include "Goods.h"
+#include "Supplier.h"
 #include "Retailer.h"
 #include "Customer.h"
 
@@ -30,7 +31,7 @@ unsigned Customer::selectOrder(Retailer* retailer, unsigned orderID, unsigned go
             break;
         }
     }
-    retailer.acceptOrder(*newOrder);
+    retailer->acceptOrder(*newOrder);
     
     return newOrder->orderID;
 }
@@ -55,7 +56,7 @@ unsigned Customer::viewOrder(Retailer* retailer, unsigned ID) {
 }
 
 double Customer::makePayment(Retailer* retailer, unsigned orderID, double amount) {
-    return retailer.acceptPayment(orderID, amount);
+    return retailer->acceptPayment(orderID, amount);
 }
 
 bool Customer::contactRetailer(Retailer* retailer) {
