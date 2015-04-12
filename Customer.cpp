@@ -21,7 +21,7 @@ int Customer::viewStock() {
 }
 
 unsigned Customer::selectOrder(Retailer* retailer, unsigned orderID, unsigned goodID, unsigned qty) {
-    Retailer::order *newOrder;
+    Retailer::order *newOrder = new Retailer::order();
     newOrder->orderID = orderID;
     newOrder->orderQty = qty;
     for(theGoods->iter = theGoods->goodsList.begin(); theGoods->iter != theGoods->goodsList.end(); theGoods->iter++) {
