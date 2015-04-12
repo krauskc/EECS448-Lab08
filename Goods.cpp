@@ -6,42 +6,47 @@
 using namespace std;
 
 Goods::Goods() {
-    
+    goodCount = 0;
 }
 
-int Goods::addGood(unsigned ID, string name, unsigned quantity, double price) {
-    good newGood;
-    newGood.goodID = ID;
-    newGood.goodName = name;
-    newGood.goodQuantity = quantity;
-    newGood.goodPrice = price;
+unsigned Goods::addGood(unsigned ID, string name, unsigned quantity, double price) {
+    good* newGood = new good();
+    newGood->goodID = ID;
+    newGood->goodName = name;
+    newGood->goodQuantity = quantity;
+    newGood->goodPrice = price;
     
-    goodsList.push_front(newGood);
+    goodsList.push_front(*newGood);
+    goodCount++;
     return goodsList.size();
 }
 
-int Goods::removeGood(unsigned ID) {
+unsigned Goods::removeGood(unsigned ID) {
+    int removed = 0;
     for(iter = goodsList.begin(); iter != goodsList.end(); iter++) {
         if(iter->goodID == ID) {
             list<good>::iterator temp = iter;
             goodsList.erase(iter);
             iter = temp;
+            removed++;
         }
     }
     
+    //goodCount -= removed;
     return goodsList.size();
 }
 
-int Goods::displayList() {
+unsigned Goods::displayList() {
     goodsList.sort(comparePrice);
-    cout << "Displaying list of items, sorted by price:\n\n";
+    cout << "\tDisplaying list of items, sorted by price:\n";
     for(iter = goodsList.begin(); iter != goodsList.end(); iter++) {
-        cout << "ID: " << iter->goodID << '\n';
-        cout << "Name: " << iter->goodName << '\n';
-        cout << "Quantity: " << iter->goodQuantity << '\n';
-        cout << "goodPrice: $" << iter->goodPrice << '\n';
+        cout << "\tItem ID: " << iter->goodID << ",";
+        cout << "\tName: " << iter->goodName << ",";
+        cout << "\tQuantity: " << iter->goodQuantity << ",";
+        cout << "\tPrice: $" << iter->goodPrice << ",";
         cout << '\n';
     }
+    cout << '\n';
     
     return goodsList.size();
 }

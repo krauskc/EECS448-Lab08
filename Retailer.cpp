@@ -10,11 +10,13 @@ using namespace std;
 Retailer::Retailer() {
     theGoods = new Goods;
     SupplierA = new Supplier;
+    orderCount = 0;
 }
 
 Retailer::Retailer(Goods* goods, Supplier* supplier) {
     theGoods = goods;
     SupplierA = supplier;
+    orderCount = 0;
 }
 
 double Retailer::getOrder(unsigned orderID) {
@@ -34,7 +36,27 @@ unsigned Retailer::checkSupply(unsigned goodID) {
         }
     }
     
-    return 0;
+    return -1;
+}
+
+string Retailer::getName(unsigned goodID) {
+    for(theGoods->iter = theGoods->goodsList.begin(); theGoods->iter != theGoods->goodsList.end(); theGoods->iter++) {
+        if(theGoods->iter->goodID == goodID) {
+            return theGoods->iter->goodName;
+        }
+    }
+
+    return "Not found";
+}
+
+double Retailer::getPrice(unsigned goodID) {
+    for(theGoods->iter = theGoods->goodsList.begin(); theGoods->iter != theGoods->goodsList.end(); theGoods->iter++) {
+        if(theGoods->iter->goodID == goodID) {
+            return theGoods->iter->goodPrice;
+        }
+    }
+
+    return -1.0;
 }
 
 unsigned Retailer::acceptOrder(order newOrder) {
@@ -45,7 +67,7 @@ unsigned Retailer::acceptOrder(order newOrder) {
         
     }
     
-    
+    orderCount++;
     return newOrder.orderID;
 }
 
@@ -85,6 +107,26 @@ bool Retailer::ackContact() {
     return true;
 }
 
-bool compareOrder(const Retailer::order& first, const Retailer::order& second) {
+void Retailer::viewOrders() {
+    orderList.sort(compareOrder);
+    bool ordersExist = false;
+    for(iter = orderList.begin(); iter != orderList.end(); iter++) {
+        if(!ordersExist) {
+            ordersExist = true;
+            cout << "\tDisplaying list of orders, sorted by ID:\n";
+        }
+        cout << "\tOrder ID: " << iter->orderID << ",";
+        cout << "\tItem Name: " << iter->theGood.goodName << ",";
+        cout << "\tQuantity: " << iter->orderQty << ",";
+        cout << "\tTotal Price: $" << iter->totalPrice << ",";
+        cout << '\n';
+    }
+    if(!ordersExist) {
+        cout << "\tNo orders exist\n";
+    }
+    cout << '\n';
+}
+
+bool Retailer::compareOrder(const Retailer::order& first, const Retailer::order& second) {
     return (first.orderID <= second.orderID);
 }

@@ -16,12 +16,13 @@ class Goods {
         };
         std::list<good> goodsList;
         std::list<good>::iterator iter;
+        unsigned goodCount;
         
         Goods();
         //Goods(unsigned ID, std::string name, unsigned quantity, double price);
-        int         addGood(unsigned ID, std::string name, unsigned quantity, double price);
-        int         removeGood(unsigned ID);
-        int         displayList();
+        unsigned    addGood(unsigned ID, std::string name, unsigned quantity, double price);
+        unsigned    removeGood(unsigned ID);
+        unsigned    displayList();
         bool        updateGood(unsigned ID, std::string name, unsigned quantity, double price);
         static bool comparePrice(const Goods::good& first, const Goods::good& second);
 };
