@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cstdio>
 #include <string>
 #include <list>
 #include "Goods.h"
@@ -43,7 +44,7 @@ unsigned Goods::displayList() {
         cout << "\tItem ID: " << iter->goodID << ",";
         cout << "\tName: " << iter->goodName << ",";
         cout << "\tQuantity: " << iter->goodQuantity << ",";
-        cout << "\tPrice: $" << iter->goodPrice << ",";
+        printf("\tPrice: $%.2f", iter->goodPrice);
         cout << '\n';
     }
     cout << '\n';

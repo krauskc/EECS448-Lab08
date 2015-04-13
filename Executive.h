@@ -16,6 +16,8 @@ class Executive {
         void        init();
         void        loop();
         unsigned    newOrder();
+        void        payment();
+        static bool isNumber(const std::string str);
 };
 
 #endif

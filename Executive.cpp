@@ -1,5 +1,6 @@
 #include <cstdlib>
 #include <iostream>
+#include <cstdio>
 #include <string>
 #include <list>
 
@@ -32,6 +33,7 @@ void Executive::loop() {
         cout << "1. View Stock\n";
         cout << "2. Start Order\n";
         cout << "3. View Orders\n";
+        cout << "4. Make Payment\n";
         cout << "...\n";
         cout << "9. Quit\n";
         cout << "\nEnter a number from the list above: ";
@@ -45,6 +47,9 @@ void Executive::loop() {
             break;
         case '3':
             retailer->viewOrders();
+            break;
+        case '4':
+            payment();
             break;
         case '9':
         case 'Q':
@@ -68,11 +73,15 @@ unsigned Executive::newOrder() {
         cout << "\tEnter the Item ID number (or \"cancel\" to return): ";
         input = "";
         cin >> input;
-        if(input == "cancel") {
+        if(input == "cancel" || input == "Cancel" || input == "CANCEL") {
             cout << "\tOrder canceled\n\n";
             return 0;
-        } else {
+        } else if(isNumber(input)) {
             id = atoi(input.c_str());
+        } else {
+            cout << "\tError: Not a valid number\n";
+            valid = false;
+            continue;
         }
         unsigned inStock = retailer->checkSupply(id);
         if(inStock <= 0) {
@@ -81,35 +90,136 @@ unsigned Executive::newOrder() {
             continue;
         } else {
             cout << "\tAmount of " << retailer->getName(id) << " in stock: " << inStock << '\n';
-            cout << "\tPrice per unit: $" << retailer->getPrice(id) << '\n';
+            printf("\tPrice per unit: $%.2f\n", retailer->getPrice(id));
         }
         bool validQty = false;
         while(!validQty) {
             cout << "\tEnter quantity desired (or \"cancel\" to return): ";
             input = "";
             cin >> input;
-            if(input == "cancel") {
+            if(input == "cancel" || input == "Cancel" || input == "CANCEL") {
                 cout << '\n';
                 break;
-            } else {
+            } else if(isNumber(input)) {
                 qty = atoi(input.c_str());
+            } else {
+                cout << "\tError: Not a valid number\n";
+                validQty = false;
+                continue;
             }
             //cout << qty << '\n';
             if(inStock < qty) {
                 //cout << "invalid\n";
-                cout << "\n\tError: Only " << inStock << " in stock\n";
-                validQty = false;
-                continue;
+                cout << "\n\tOnly " << inStock << " in stock. Order more from supplier? (Y/N): ";
+                input = "";
+                cin >> input;
+                if(input[0] == 'Y' || input[0] == 'y') {
+                    retailer->orderGoods(supplier, id, (qty - inStock));
+                    cout << '\t' << (qty - inStock) << " additional units ordered\n";
+                    validQty = true;
+                    printf("\tTotal Due: $%.2f\n", qty*(retailer->getPrice(id)));
+                    break;
+                } else {
+                    validQty = false;
+                    continue;
+                }
             } else {
                 //cout << "valid\n";
                 validQty = true;
-                cout << "\tTotal cost: $" << qty*(retailer->getPrice(id)) << "\n\n";
+                printf("\tTotal Due: $%.2f\n", qty*(retailer->getPrice(id)));
                 break;
             }
         }
-        valid = validQty;
+        if(validQty) {
+            cout << "\tConfirm? (Y/N): ";
+            input = "";
+            cin >> input;
+            cout << '\n';
+            valid = (input[0] == 'Y' || input[0] == 'y');
+        } else {
+            valid = false;
+        }
     }
+    printf("\tOrder added. Amount due: $%.2f\n\n", qty*retailer->getPrice(id));
     return customer->selectOrder(retailer, retailer->orderCount, id, qty);
+}
+
+void Executive::payment() {
+    string input = "";
+    unsigned orderID;
+    double amount, amountDue;
+    bool valid = false;
+    while(!valid) {
+        cout << "\tEnter the Order ID number (or \"cancel\" to return): ";
+        input = "";
+        cin >> input;
+        if(input == "cancel" || input == "Cancel" || input == "CANCEL") {
+            cout << "\tPayment canceled\n\n";
+            return;
+        } else if(isNumber(input)) {
+            orderID = atoi(input.c_str());
+        } else {
+            cout << "\tError: Not a valid number\n";
+            valid = false;
+            continue;
+        }
+        amountDue = retailer->getOrder(orderID);
+        if(amountDue <= 0) {
+            cout << "\n\tError: Order not active\n";
+            valid = false;
+            continue;
+        } else {
+            cout << "\tOrder #" << orderID << '\n';
+            printf("\tAmount Due: $%.2f\n", retailer->getOrder(orderID));
+        }
+        bool validAmount = false;
+        while(!validAmount) {
+            cout << "\tEnter payment amount (or \"cancel\" to return): ";
+            input = "";
+            cin >> input;
+            if(input == "cancel" || input == "Cancel" || input == "CANCEL") {
+                cout << '\n';
+                break;
+            } else if(isNumber(input)) {
+                amount = atof(input.c_str());
+                validAmount = true;
+            } else {
+                cout << "\tError: Not a valid number\n";
+                validAmount = false;
+                continue;
+            }
+            printf("\n\tPayment of $%.2f\n", amount);
+            if(amountDue < amount) {
+                printf("\tChange: $%.2f\n", (amount - amountDue));
+            } else {
+                printf("\tRemaining amount due: $%.2f\n", (amountDue - amount));
+            }
+        }
+        if(validAmount) {
+            cout << "\tConfirm? (Y/N): ";
+            input = "";
+            cin >> input;
+            cout << '\n';
+            valid = (input[0] == 'Y' || input[0] == 'y');
+        } else {
+            valid = false;
+        }
+    }
+    if(amountDue >= amount) {
+        printf("\tPayment of $%.2f complete. Remaining balance: $%.2f\n\n", amount, (amountDue - amount));
+    } else {
+        printf("\tPayment of $%.2f complete. Change: $%.2f\n\n", amount, (amount - amountDue));
+    }
+    customer->makePayment(retailer, orderID, amount);
+}
+
+bool Executive::isNumber(const string str) {
+    for(unsigned i = 0; i < str.length(); i++) {
+        if(!isdigit(str[i]) && str[i] != '.') {
+            return false;
+        }
+    }
+    return true;
 }
 
 Executive::Executive() {
