@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cstdio>
 #include <string>
 #include <list>
 #include "Goods.h"
@@ -43,7 +44,7 @@ unsigned Customer::viewOrder(Retailer* retailer, unsigned ID) {
             cout << "Order# " << ID << '\n';
             cout << "Good: " << retailer->iter->theGood.goodName << '\n';
             cout << "Quantity: " << retailer->iter->orderQty << '\n';
-            cout << "Total Price: $" << retailer->iter->totalPrice << '\n';
+            printf("Amount Due: $%.2f\n", retailer->iter->totalPrice);
             orderID = ID;
             break;
         }
